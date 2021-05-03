@@ -4,6 +4,7 @@ import com.trytig.cobbleoregen.CobbleOreGen;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockFromToEvent;
@@ -13,20 +14,12 @@ import java.util.List;
 import java.util.Random;
 
 public class CobbleGenerationEvent implements Listener {
-    private List<Material> ores = new ArrayList<>();
-    private Random random = new Random();
+    private static List<Material> ores = new ArrayList<>();
+    private static Random random = new Random();
 
     public CobbleGenerationEvent(CobbleOreGen plugin) {
-        // Add list of ores and blocks to generate to
-        ores.add(Material.GOLD_ORE);
-        ores.add(Material.IRON_ORE);
-        ores.add(Material.COAL_ORE);
-        ores.add(Material.LAPIS_ORE);
-        ores.add(Material.DIAMOND_ORE);
-        ores.add(Material.REDSTONE_ORE);
-        ores.add(Material.EMERALD_ORE);
-        ores.add(Material.STONE);
-        ores.add(Material.COBBLESTONE);
+        // Reload config
+        reloadConfig(plugin);
 
         // Register the event
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -57,6 +50,15 @@ public class CobbleGenerationEvent implements Listener {
                     }
                 }
             }
+        }
+    }
+
+    public static void reloadConfig(CobbleOreGen plugin) {
+        ores.clear();
+        plugin.reloadConfig();
+        FileConfiguration configuration = plugin.getConfig();
+        for (String oreMaterialName : configuration.getStringList("ores")) {
+            ores.add(Material.valueOf(oreMaterialName));
         }
     }
 }
